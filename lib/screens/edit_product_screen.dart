@@ -21,7 +21,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   late TextEditingController _priceController;
   late ProductCategory _selectedCategory;
   late List<String> _imageUrls;
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
   @override

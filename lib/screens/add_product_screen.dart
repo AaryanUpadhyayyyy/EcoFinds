@@ -19,8 +19,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   ProductCategory _selectedCategory = ProductCategory.other;
-  List<String> _imageUrls = [];
-  List<File> _selectedImages = [];
+  final List<String> _imageUrls = [];
+  final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
   @override

@@ -5,7 +5,6 @@ import '../providers/auth_provider.dart';
 import '../providers/order_provider.dart';
 import '../providers/product_provider.dart';
 import '../models/cart_item.dart';
-import '../models/order.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});

@@ -105,7 +105,7 @@ class CartProvider with ChangeNotifier {
     try {
       // Create orders from cart items instead of direct purchases
       final orders = _cartItems.map((item) => Order(
-        id: DateTime.now().millisecondsSinceEpoch.toString() + '_${item.productId}',
+        id: '${DateTime.now().millisecondsSinceEpoch}_${item.productId}',
         productId: item.productId,
         productTitle: item.title,
         productImageUrl: item.imageUrl,
