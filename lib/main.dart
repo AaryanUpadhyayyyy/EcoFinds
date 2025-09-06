@@ -6,6 +6,7 @@ import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const EcoFindsApp());
@@ -66,17 +67,25 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
+  bool _showSplash = true;
+
   @override
   void initState() {
     super.initState();
-    // Load current user on app start
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Show splash for 2 seconds, then load user
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _showSplash = false;
+      });
       Provider.of<AuthProvider>(context, listen: false).loadCurrentUser();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_showSplash) {
+      return const SplashScreen();
+    }
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         if (authProvider.isLoading) {
@@ -86,9 +95,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         if (authProvider.isAuthenticated) {
-          return const MainNavigation();
+          return const SafeArea(child: MainNavigation());
         } else {
-          return const LoginScreen();
+          return const SafeArea(
+            child: SingleChildScrollView(child: LoginScreen()),
+          );
         }
       },
     );

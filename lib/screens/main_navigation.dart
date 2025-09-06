@@ -6,9 +6,7 @@ import '../providers/order_provider.dart';
 import 'product_feed_screen.dart';
 import 'my_listings_screen.dart';
 import 'cart_screen.dart';
-import 'purchases_screen.dart';
 import 'my_orders_screen.dart';
-import 'order_management_screen.dart';
 import 'user_dashboard_screen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -26,8 +24,6 @@ class _MainNavigationState extends State<MainNavigation> {
     const MyListingsScreen(),
     const CartScreen(),
     const MyOrdersScreen(),
-    const OrderManagementScreen(),
-    const PurchasesScreen(),
     const UserDashboardScreen(),
   ];
 
@@ -75,14 +71,6 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
             label: 'My Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Purchases',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

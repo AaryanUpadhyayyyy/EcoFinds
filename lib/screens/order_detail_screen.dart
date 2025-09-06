@@ -108,23 +108,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           return Column(
             children: [
               // Order Info Section
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.grey[50],
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product Info
-                    Row(
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.grey[50],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: currentOrder.productImageUrl.isNotEmpty
+                        // Product Info
+                        Row(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: currentOrder.productImageUrl.isNotEmpty
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: currentOrder.productImageUrl.startsWith('http')
@@ -179,7 +181,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: currentOrder.statusColor.withOpacity(0.1),
+                                  color: currentOrder.statusColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -223,6 +225,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       icon: Icons.calendar_today,
                     ),
                   ],
+                    ),
+                  ),
                 ),
               ),
 

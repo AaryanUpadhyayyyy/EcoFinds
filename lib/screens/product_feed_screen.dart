@@ -90,8 +90,10 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          Provider.of<ProductProvider>(context, listen: false)
-                              .searchProducts('');
+                          Provider.of<ProductProvider>(
+                            context,
+                            listen: false,
+                          ).searchProducts('');
                         },
                       )
                     : null,
@@ -103,8 +105,10 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
                 ),
               ),
               onChanged: (value) {
-                Provider.of<ProductProvider>(context, listen: false)
-                    .searchProducts(value);
+                Provider.of<ProductProvider>(
+                  context,
+                  listen: false,
+                ).searchProducts(value);
               },
             ),
           ),
@@ -136,7 +140,8 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
                     }
 
                     final category = ProductCategory.values[index - 1];
-                    final isSelected = productProvider.selectedCategory == category;
+                    final isSelected =
+                        productProvider.selectedCategory == category;
 
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -163,9 +168,7 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
             child: Consumer<ProductProvider>(
               builder: (context, productProvider, child) {
                 if (productProvider.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (productProvider.products.isEmpty) {
@@ -181,16 +184,14 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No products found',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Be the first to list a product!',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[500],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[500]),
                         ),
                       ],
                     ),
@@ -201,7 +202,7 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 0.9, // Changed from 0.85
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
@@ -219,9 +220,7 @@ class _ProductFeedScreenState extends State<ProductFeedScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddProductScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const AddProductScreen()),
           );
         },
         backgroundColor: Colors.green[600],
@@ -238,151 +237,163 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ProductDetailScreen(product: product),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                ),
-              child: product.imageUrls.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      child: product.imageUrls.first.startsWith('http')
-                          ? Image.network(
-                              product.imageUrls.first,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    size: 48,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                            )
-                          : Image.file(
-                              File(product.imageUrls.first),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    size: 48,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                            ),
-                    )
-                  : const Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
-                    ),
+    return SizedBox(
+      width: 220, // Increased width
+      height: 340, // Increased height
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ProductDetailScreen(product: product),
               ),
-            ),
-
-            // Product Info
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Image
+              Expanded(
+                flex: 3,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      product.categoryDisplayName,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                    const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green[600],
-                            fontSize: 16,
+                  ),
+                  child: product.imageUrls.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
+                          child: product.imageUrls.first.startsWith('http')
+                              ? Image.network(
+                                  product.imageUrls.first,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 48,
+                                        color: Colors.grey,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Image.file(
+                                  File(product.imageUrls.first),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 48,
+                                        color: Colors.grey,
+                                      ),
+                                    );
+                                  },
+                                ),
+                        )
+                      : const Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 48,
+                            color: Colors.grey,
                           ),
                         ),
-                        Consumer<CartProvider>(
-                          builder: (context, cartProvider, child) {
-                            final isInCart = cartProvider.isInCart(product.id);
-                            return IconButton(
-                              icon: Icon(
-                                isInCart ? Icons.shopping_cart : Icons.add_shopping_cart,
-                                color: isInCart ? Colors.green[600] : Colors.grey[600],
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                if (isInCart) {
-                                  cartProvider.removeFromCart(product.id);
-                                } else {
-                                  cartProvider.addToCart(
-                                    CartItem(
-                                      productId: product.id,
-                                      title: product.title,
-                                      price: product.price,
-                                      imageUrl: product.imageUrls.isNotEmpty
-                                          ? product.imageUrls.first
-                                          : '',
-                                      sellerUsername: product.sellerUsername,
-                                      addedAt: DateTime.now(),
-                                    ),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ],
+
+              // Product Info
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        product.categoryDisplayName,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '\$${product.price.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[600],
+                                fontSize: 16,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Consumer<CartProvider>(
+                            builder: (context, cartProvider, child) {
+                              final isInCart = cartProvider.isInCart(
+                                product.id,
+                              );
+                              return IconButton(
+                                icon: Icon(
+                                  isInCart
+                                      ? Icons.shopping_cart
+                                      : Icons.add_shopping_cart,
+                                  color: isInCart
+                                      ? Colors.green[600]
+                                      : Colors.grey[600],
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  if (isInCart) {
+                                    cartProvider.removeFromCart(product.id);
+                                  } else {
+                                    cartProvider.addToCart(
+                                      CartItem(
+                                        productId: product.id,
+                                        title: product.title,
+                                        price: product.price,
+                                        imageUrl: product.imageUrls.isNotEmpty
+                                            ? product.imageUrls.first
+                                            : '',
+                                        sellerUsername: product.sellerUsername,
+                                        addedAt: DateTime.now(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
