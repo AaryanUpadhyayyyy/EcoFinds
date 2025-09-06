@@ -11,6 +11,33 @@ enum ProductCategory {
   other,
 }
 
+extension ProductCategoryExtension on ProductCategory {
+  String get categoryDisplayName {
+    switch (this) {
+      case ProductCategory.electronics:
+        return 'Electronics';
+      case ProductCategory.clothing:
+        return 'Clothing';
+      case ProductCategory.furniture:
+        return 'Furniture';
+      case ProductCategory.books:
+        return 'Books';
+      case ProductCategory.sports:
+        return 'Sports';
+      case ProductCategory.beauty:
+        return 'Beauty';
+      case ProductCategory.home:
+        return 'Home';
+      case ProductCategory.toys:
+        return 'Toys';
+      case ProductCategory.automotive:
+        return 'Automotive';
+      case ProductCategory.other:
+        return 'Other';
+    }
+  }
+}
+
 class Product {
   final String id;
   final String title;

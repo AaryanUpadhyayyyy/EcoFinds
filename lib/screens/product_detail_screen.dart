@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 import '../providers/cart_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/product.dart';
@@ -28,19 +29,33 @@ class ProductDetailScreen extends StatelessWidget {
               height: 300,
               color: Colors.grey[200],
               child: product.imageUrls.isNotEmpty
-                  ? Image.network(
-                      product.imageUrls.first,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    )
+                  ? product.imageUrls.first.startsWith('http')
+                      ? Image.network(
+                          product.imageUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        )
+                      : Image.file(
+                          File(product.imageUrls.first),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        )
                   : const Center(
                       child: Icon(
                         Icons.image,

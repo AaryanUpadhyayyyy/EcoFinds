@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/cart_item.dart';
 import '../models/purchase.dart';
+import '../models/order.dart';
 
 class CartProvider with ChangeNotifier {
   List<CartItem> _cartItems = [];
@@ -97,30 +98,66 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  Future<void> checkout() async {
+  Future<List<Order>> checkout(String buyerId, String buyerUsername) async {
     _setLoading(true);
     _clearError();
 
     try {
-      // Create purchases from cart items
-      final newPurchases = _cartItems.map((item) => Purchase(
+      // Create orders from cart items instead of direct purchases
+      final orders = _cartItems.map((item) => Order(
         id: DateTime.now().millisecondsSinceEpoch.toString() + '_${item.productId}',
         productId: item.productId,
-        title: item.title,
-        price: item.price,
-        imageUrl: item.imageUrl,
+        productTitle: item.title,
+        productImageUrl: item.imageUrl,
+        productPrice: item.price,
+        buyerId: buyerId,
+        buyerUsername: buyerUsername,
+        sellerId: '', // Will be filled by product provider
         sellerUsername: item.sellerUsername,
-        purchaseDate: DateTime.now(),
+        status: OrderStatus.pending,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        notes: 'Checkout request from cart',
       )).toList();
 
-      _purchases.addAll(newPurchases);
+      // Clear cart after creating orders
       _cartItems.clear();
-
       await _saveCart();
+      
+      // Return orders to be processed by order provider
+      notifyListeners();
+      
+      // Return orders for further processing
+      return orders;
+    } catch (e) {
+      _setError('Failed to checkout: ${e.toString()}');
+      return [];
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> completePurchase(Order order) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      // Create purchase from approved order
+      final purchase = Purchase(
+        id: order.id,
+        productId: order.productId,
+        title: order.productTitle,
+        price: order.productPrice,
+        imageUrl: order.productImageUrl,
+        sellerUsername: order.sellerUsername,
+        purchaseDate: DateTime.now(),
+      );
+
+      _purchases.add(purchase);
       await _savePurchases();
       notifyListeners();
     } catch (e) {
-      _setError('Failed to checkout: ${e.toString()}');
+      _setError('Failed to complete purchase: ${e.toString()}');
     } finally {
       _setLoading(false);
     }

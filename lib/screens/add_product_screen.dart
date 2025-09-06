@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../providers/product_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/product.dart';
@@ -18,6 +20,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _priceController = TextEditingController();
   ProductCategory _selectedCategory = ProductCategory.other;
   List<String> _imageUrls = [];
+  List<File> _selectedImages = [];
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -64,16 +68,85 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
-  void _addImagePlaceholder() {
-    setState(() {
-      _imageUrls.add('https://via.placeholder.com/300x300?text=Product+Image');
-    });
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+          _imageUrls.add(image.path); // For now, we'll use the local path
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+          _imageUrls.add(image.path); // For now, we'll use the local path
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error taking photo: $e')),
+      );
+    }
   }
 
   void _removeImage(int index) {
     setState(() {
       _imageUrls.removeAt(index);
+      if (index < _selectedImages.length) {
+        _selectedImages.removeAt(index);
+      }
     });
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImageFromGallery();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImageFromCamera();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -182,7 +255,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ),
               const SizedBox(height: 8),
 
-              // Image Placeholders
+              // Selected Images
               if (_imageUrls.isNotEmpty)
                 SizedBox(
                   height: 100,
@@ -203,15 +276,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  _imageUrls[index],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Center(
-                                      child: Icon(Icons.image),
-                                    );
-                                  },
-                                ),
+                                child: _imageUrls[index].startsWith('http')
+                                    ? Image.network(
+                                        _imageUrls[index],
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Center(
+                                            child: Icon(Icons.image),
+                                          );
+                                        },
+                                      )
+                                    : Image.file(
+                                        File(_imageUrls[index]),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Center(
+                                            child: Icon(Icons.image),
+                                          );
+                                        },
+                                      ),
                               ),
                             ),
                             Positioned(
@@ -244,9 +327,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               // Add Image Button
               OutlinedButton.icon(
-                onPressed: _addImagePlaceholder,
+                onPressed: _showImagePickerOptions,
                 icon: const Icon(Icons.add_photo_alternate),
-                label: const Text('Add Image (Placeholder)'),
+                label: const Text('Add Image'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),

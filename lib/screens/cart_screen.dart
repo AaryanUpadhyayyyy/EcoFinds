@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/order_provider.dart';
+import '../providers/product_provider.dart';
 import '../models/cart_item.dart';
+import '../models/order.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -145,9 +149,9 @@ class CartScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Checkout'),
+        title: const Text('Request Purchase'),
         content: Text(
-          'Are you sure you want to purchase ${cartProvider.cartItemCount} item(s) for \$${cartProvider.totalPrice.toStringAsFixed(2)}?',
+          'Send purchase requests for ${cartProvider.cartItemCount} item(s) totaling \$${cartProvider.totalPrice.toStringAsFixed(2)}?\n\nSellers will review and approve your requests.',
         ),
         actions: [
           TextButton(
@@ -155,24 +159,57 @@ class CartScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              cartProvider.checkout();
+            onPressed: () async {
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Purchase completed successfully!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              await _processCheckout(context, cartProvider);
             },
             child: Text(
-              'Confirm',
+              'Send Requests',
               style: TextStyle(color: Colors.green[600]),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _processCheckout(BuildContext context, CartProvider cartProvider) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+
+    if (authProvider.currentUser == null) return;
+
+    try {
+      // Create orders from cart
+      final orders = await cartProvider.checkout(
+        authProvider.currentUser!.id,
+        authProvider.currentUser!.username,
+      );
+
+      // Fill in seller IDs and create orders
+      for (final order in orders) {
+        final product = productProvider.getProductById(order.productId);
+        if (product != null) {
+          final completeOrder = order.copyWith(sellerId: product.sellerId);
+          await orderProvider.createOrder(completeOrder);
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Purchase requests sent successfully! Check "My Orders" for updates.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
